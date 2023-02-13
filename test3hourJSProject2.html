@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lets scale the app to more users</title>
+
+</head>
+<body>
+    <form id="myForm" onsubmit="saveUserDetails(event)">
+        <label for="price">Selling Price:</label>
+        <input type="number" id="price" name="price" required>
+        <label for="ProdName">Product Name:</label>
+        <input type="text" id="ProdName" name="ProdName" required>
+        <label for="Category">Choose a Category:</label>
+        <select id="Category" name="Category">
+            <option >Electronic Items</option>
+            <option >Food Items</option>
+            <option >Skincare Items</option>
+        </select>
+        <button id="btn">Add Product</button>
+    </form>
+
+    <h1>Products</h1>
+
+    <h2>Electronic Items
+        <ul id="Electronic"></ul>
+    </h2>
+
+    <h2>Food Items
+        <ul id="Food"></ul>
+    </h2>
+    
+    <h2>Skincare Items
+        <ul id="Skincare"></ul>
+    </h2>
+    
+
+    
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.min.js"></script>
+<script>
+    
+    function saveUserDetails(event){
+        event.preventDefault();
+        const price = event.target.price.value;
+        const ProdName = event.target.ProdName.value;
+        const Category = event.target.Category.value;
+        const obj = {
+            price,
+            ProdName,
+            Category
+
+        }
+
+        axios.post("https://crudcrud.com/api/0542cf259bed4ea4b1bc48283a390d32/Products",obj)
+        .then((response) => {
+            showUserOnScreen(response.data);
+        })
+        .catch((err) => {
+            document.body.innerHTML = document.body.innerHTML + "<h4>Something went wrong</h4>"
+            console.log(err);
+        })
+
+        
+
+    }
+
+    window.addEventListener("DOMContentLoaded", () =>{
+
+        axios.get("https://crudcrud.com/api/0542cf259bed4ea4b1bc48283a390d32/Products")
+        .then((response) => {
+            for(let i=0;i<response.data.length;i++){
+                showUserOnScreen(response.data[i])
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+
+    })
+
+
+
+    function showUserOnScreen(obj){
+
+            document.getElementById('price').value=''
+            document.getElementById('ProdName').value=''
+            
+            
+            if(obj.Category=='Electronic Items'){
+
+                const parentElectronics = document.getElementById('Electronic');
+                const  childElem = `<li id=${obj._id}> ${obj.price}-${obj.Category}-${obj.ProdName}
+                                <button onclick=deleteUser('${obj._id}')>delete</button>`
+
+                parentElectronics.innerHTML = parentElectronics.innerHTML+childElem;
+
+            }
+
+            if(obj.Category=='Food Items'){
+
+                const parentFoods = document.getElementById('Food');
+                const  childElem = `<li id=${obj._id}> ${obj.price}-${obj.Category}-${obj.ProdName}
+                                <button onclick=deleteUser('${obj._id}')>delete</button>`
+
+                parentFoods.innerHTML = parentFoods.innerHTML+childElem;
+
+            }
+
+            if(obj.Category=='Skincare Items'){
+
+                const parentSikncares = document.getElementById('Skincare');
+                const  childElem = `<li id=${obj._id}> ${obj.price}-${obj.Category}-${obj.ProdName}
+                                <button onclick=deleteUser('${obj._id}')>delete</button>`
+
+                parentSikncares.innerHTML = parentSikncares.innerHTML+childElem;
+
+            }
+            
+            
+            
+    }
+
+
+    function deleteUser(objId){
+        axios.delete(`https://crudcrud.com/api/0542cf259bed4ea4b1bc48283a390d32/Products/${objId}`)
+        .then((response) => {
+            console.log('success')
+            removeUserFromScreen(objId)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
+
+
+
+    function removeUserFromScreen(objId){
+        
+        let chilTobeDeleted = document.getElementById(objId);
+
+        let parentEle = document.getElementById(objId).parentElement;
+
+        parentEle.removeChild(chilTobeDeleted);
+
+        
+    }
+
+
+    
+</script>
+</html>
